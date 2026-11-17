@@ -3,13 +3,19 @@ const cursorCanvas = document.querySelector("#cursor-canvas");
 const soundToggle = document.querySelector(".sound-toggle");
 const cursorTracker = document.querySelector(".cursor-tracker");
 const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+const clickAudio = new Audio("./audio/button-ui-app.wav");
+clickAudio.preload = "auto";
+clickAudio.playbackRate = 0.85;
 
 let soundEnabled = true;
 let audioContext;
 let audioOutput;
+let clickAudioSource;
 let reverb;
 let reverbOutput;
 let audioUnavailable = false;
+
+clickAudio.addEventListener("error", reportAudioFailure, { once: true });
 
 function updateSoundControl(message) {
     if (!soundToggle) return;
@@ -39,12 +45,12 @@ function getAudioContext() {
             audioOutput.gain.value = 0.68;
             audioOutput.connect(audioContext.destination);
 
-            const reverbLength = Math.floor(audioContext.sampleRate * 0.7);
+            const reverbLength = Math.floor(audioContext.sampleRate * 3);
             const impulse = audioContext.createBuffer(2, reverbLength, audioContext.sampleRate);
             for (let channel = 0; channel < impulse.numberOfChannels; channel += 1) {
                 const samples = impulse.getChannelData(channel);
                 for (let index = 0; index < reverbLength; index += 1) {
-                    const fade = Math.pow(1 - index / reverbLength, 3.2);
+                    const fade = Math.pow(1 - index / reverbLength, 2.2);
                     samples[index] = (Math.random() * 2 - 1) * fade;
                 }
             }
@@ -52,9 +58,13 @@ function getAudioContext() {
             reverb = audioContext.createConvolver();
             reverb.buffer = impulse;
             reverbOutput = audioContext.createGain();
-            reverbOutput.gain.value = 0.2;
+            reverbOutput.gain.value = 0.28;
             reverb.connect(reverbOutput);
             reverbOutput.connect(audioContext.destination);
+
+            clickAudioSource = audioContext.createMediaElementSource(clickAudio);
+            clickAudioSource.connect(audioOutput);
+            clickAudioSource.connect(reverb);
         } catch {
             reportAudioFailure();
             return null;
@@ -69,34 +79,13 @@ function reportAudioFailure() {
     updateSoundControl("Efek suara tidak tersedia di browser ini");
 }
 
-function playCrispSound(context) {
+function playAmbientClick(context) {
     if (!soundEnabled || context.state !== "running") return;
 
-    const now = context.currentTime;
-    const baseFrequency = 690 + Math.random() * 180;
-    const voices = [
-        { ratio: 1, volume: 0.075 },
-        { ratio: 2.01, volume: 0.018 }
-    ];
-
-    for (const voice of voices) {
-        const oscillator = context.createOscillator();
-        const envelope = context.createGain();
-        const startFrequency = baseFrequency * voice.ratio;
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(startFrequency, now);
-        oscillator.frequency.exponentialRampToValueAtTime(startFrequency * 1.65, now + 0.045);
-        oscillator.frequency.exponentialRampToValueAtTime(startFrequency * 0.86, now + 0.13);
-        oscillator.frequency.exponentialRampToValueAtTime(startFrequency * 1.05, now + 0.19);
-        envelope.gain.setValueAtTime(0.0001, now);
-        envelope.gain.exponentialRampToValueAtTime(voice.volume, now + 0.008);
-        envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-        oscillator.connect(envelope);
-        envelope.connect(audioOutput);
-        envelope.connect(reverb);
-        oscillator.start(now);
-        oscillator.stop(now + 0.21);
-    }
+    clickAudio.pause();
+    clickAudio.currentTime = 0;
+    const playback = clickAudio.play();
+    if (playback) playback.catch(reportAudioFailure);
 }
 
 function playSound() {
@@ -104,12 +93,12 @@ function playSound() {
     if (!context) return;
 
     if (context.state === "running") {
-        playCrispSound(context);
+        playAmbientClick(context);
         return;
     }
 
     context.resume().then(
-        () => playCrispSound(context),
+        () => playAmbientClick(context),
         reportAudioFailure
     );
 }

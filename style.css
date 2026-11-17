@@ -376,29 +376,45 @@ h1 > span:first-of-type,
 }
 
 .hero-art {
-    min-height: 455px;
+    width: min(100%, 460px);
+    aspect-ratio: 1;
+    min-height: 0;
     position: relative;
-    overflow: hidden;
-    border-radius: 48% 48% 43% 43% / 43% 43% 50% 50%;
-    background-color: #101a2b;
-    background-image:
-        radial-gradient(ellipse at 68% 28%, rgba(71, 255, 226, 0.35), transparent 38%),
-        radial-gradient(ellipse at 30% 73%, rgba(157, 73, 255, 0.36), transparent 44%),
-        linear-gradient(145deg, #111e30, #0b111f 72%);
-    background-position: center;
-    background-size: cover;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42), 0 0 52px rgba(71, 255, 226, 0.1);
+    display: grid;
+    place-items: center;
+    justify-self: end;
 }
 
 .hero-art::before {
     position: absolute;
-    top: 22%;
-    left: 19%;
-    width: 62%;
-    height: 62%;
-    border: 1px solid rgba(71, 255, 226, 0.3);
+    inset: 3%;
+    border: 1px solid rgba(71, 255, 226, 0.52);
+    border-radius: 50%;
+    box-shadow: 0 0 34px rgba(71, 255, 226, 0.1), inset 0 0 34px rgba(157, 73, 255, 0.08);
+    content: "";
+}
+
+.hero-art::after {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed rgba(157, 73, 255, 0.5);
     border-radius: 50%;
     content: "";
+    transform: rotate(-24deg) scaleX(0.84);
+}
+
+.portrait-frame {
+    width: 76%;
+    aspect-ratio: 1;
+    position: relative;
+    z-index: 1;
+    border: 7px solid transparent;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(71, 255, 226, 0.08), transparent 65%) padding-box,
+        linear-gradient(#101a2b, #101a2b) padding-box,
+        conic-gradient(from 25deg, #47ffe2, #9d49ff 32%, #b6ff3b 58%, #47ffe2 78%, #9d49ff) border-box;
+    box-shadow: 0 0 38px rgba(71, 255, 226, 0.2), 0 0 72px rgba(157, 73, 255, 0.16);
 }
 
 .art-sparkle {
@@ -752,7 +768,7 @@ h1 > span:first-of-type,
 
     .hero-art {
         width: min(100%, 430px);
-        min-height: 390px;
+        min-height: 0;
         justify-self: center;
     }
 
@@ -850,7 +866,7 @@ h1 > span:first-of-type,
     }
 
     .hero-art {
-        min-height: 320px;
+        min-height: 0;
     }
 
     .about h2,
