@@ -408,6 +408,7 @@ h1 > span:first-of-type,
     aspect-ratio: 1;
     position: relative;
     z-index: 1;
+    overflow: hidden;
     border: 7px solid transparent;
     border-radius: 50%;
     background:
@@ -415,6 +416,14 @@ h1 > span:first-of-type,
         linear-gradient(#101a2b, #101a2b) padding-box,
         conic-gradient(from 25deg, #47ffe2, #9d49ff 32%, #b6ff3b 58%, #47ffe2 78%, #9d49ff) border-box;
     box-shadow: 0 0 38px rgba(71, 255, 226, 0.2), 0 0 72px rgba(157, 73, 255, 0.16);
+}
+
+.portrait-frame img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center 42%;
 }
 
 .art-sparkle {
